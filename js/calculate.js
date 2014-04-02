@@ -21,7 +21,9 @@ traceAlgrithm.prototype = {
        var mstTree = this.createMstTree(arrObj);
        console.log("mstTree:");
        console.log(mstTree);
-
+       var result = this.getNodeByGreed(this.createObjByNode(mstTree));
+       console.log("result:");
+       console.log(result);
     },
 
     /**
@@ -97,10 +99,65 @@ traceAlgrithm.prototype = {
         return -1;
     },
     /**
-     * 获得节点的度
+     * 根据节点构造对象数组
      */
-    getNodeDegree: function(arrObj){
+    createObjByNode: function(arrObj){
+       var nodeArr = [];
+       for(var node in arrObj.node){
+           nodeArr.push({node:arrObj.node[node],"relation":[]});
+       }
+       for(var i in arrObj.relation){
+           for(var n in nodeArr){
+               if(arrObj.relation[i].start == nodeArr[n].node){
+                   nodeArr[n].relation.push({"node": arrObj.relation[i].end,"weight":arrObj.relation[i].weight});
+               }else{
+                   if(arrObj.relation[i].end == nodeArr[n].node){
+                       nodeArr[n].relation.push({"node": arrObj.relation[i].start,"weight":arrObj.relation[i].weight});
+                   }
+               }
+           }
+       }
 
+       console.log("nodeArr前:");
+       console.log(nodeArr);
+        return nodeArr;
+
+    },
+    /**
+     * 根据贪心算法构造将度大于2的删除联系
+     * @param nodeArr
+     */
+    getNodeByGreed: function(nodeArr){
+        for(var index in nodeArr){
+            if(nodeArr[index].relation.length>1){
+                //有大于一条边的需要删除之间的联系
+                nodeArr[index].relation = this.sortByWeight(nodeArr[index].relation);
+                for(var r in nodeArr[index].relation){
+                    if(r>0){
+                        nodeArr = this.removeEdge(nodeArr, nodeArr[index].node, nodeArr[index].relation[r].node);
+                        nodeArr[index].relation.splice(r, 1);
+                    }
+                }
+            }
+        }
+        console.log("nodeArr后:");
+        console.log(nodeArr);
+        return nodeArr;
+    },
+    /**
+     * 移除两个节点之间的联系
+     */
+    removeEdge: function(arrObj, start, end){
+       for(var i in arrObj){
+           if(arrObj[i].node == end){
+               for(var j in arrObj[i].relation){
+                   if(start == arrObj[i].relation[j].node){
+                       arrObj[i].relation.splice(j, 1);
+                   }
+               }
+           }
+       }
+       return arrObj;
     }
 };
 

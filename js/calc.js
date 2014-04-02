@@ -95,22 +95,38 @@ CityNode.prototype = {
     // 构造最小生成树
     createMstTree: function(){
         var self = this;
+        var start = -1,
+            end = -1;
         for(var i in self.cityRelationSets){
-            if(!(self.mstCity.in_array(self.cityRelationSets[i].start)
-                 && self.mstCity.in_array(self.cityRelationSets[i].end))){
-                self.mstCityRelationSets.push(self.cityRelationSets[i]);
-                 if(!self.mstCity.in_array(self.cityRelationSets[i].start)){
-                     self.mstCity.push(self.cityRelationSets[i].start);
-                 }
-                 if(!self.mstCity.in_array(self.cityRelationSets[i].end)){
-                     self.mstCity.push(self.cityRelationSets[i].end);
-                 }
-            }else{    // 没有形成闭环的也要添加到最小生成树中
+           if(!self.mstCity){
+               for(var forest in self.mstCity){
+                   for(var node in self.mstCity[forest]){
+                         if(self.mstCity.in_array(self.cityRelationSets[i].start)){
+                             start = forest;
+                         }
+                         if(self.mstCity.in_array(self.cityRelationSets[i].start)){
+                             end = forest;
+                         }
+                   }
+               }
+               // 此时证明start和end均在一个森林中，无须添加他们之间的边
+               if(start==end && start!=-1){
 
-            }
+               }
+               // 此时证明可以在已有的森林进行添加start或end，并且添加他们之间的边
+               if(start!=end && (start==-1 || end==-1)){
+                  if(start!=-1){
+                      self.mstCity[start].push()
+                  }
+               }
+               // 此时证明两个节点可以组成一个森林
+               if(start==end && start==-1){
+
+               }
+           }
         }
     },
-    // 是否形成了闭环
+    // 是否形成了闭环,判断之前的是否已经形成了一片森林
     isClosedLoop: function(){
        var self = this;
 
@@ -126,6 +142,28 @@ CityNode.prototype = {
 
     }
 }
+
+/**
+
+=================旅行商算法================
+1.对原来的对象数组按照权值的大小按照从小到大的顺序进行排序
+2.根据贪心算法进行添加边值
+    1)两个节点都在同一个森林中:放弃添加边值
+    2)两个节点分别在两个森林中:添加边值，合并两个森林
+    3)两个节点只有一个在森林中，另外一个不在森林中:添加这个节点和边值到这个森林中去
+    4)两个节点都不在森林中:为这两个节点添加一个森林
+3.计算各个节点的度。先将各个节点的边值按权值从小到大的顺序进行排序，然后计算各个节点的度，
+    删除度大于2的从大到小的排序之间的联系，将其置为-1
+4.获取各个节点小于2的节点，并重新取得这些度为0或1之间的完全图，所对应的权值
+5.当所有的节点度均为2的情况时，算法结束。否则跳转到步骤1
+
+=================旅行商算法->路径规划算法============
+1.定义一个函数，起到设定起点，设定终点的意思
+2.定义一个函数，起到设定优先级的意思
+
+*/
+
+
 
 var city = CityNode.prototype;
 /* 测试数据 */
@@ -144,6 +182,10 @@ city.outputCity();
 city.outputCityRelations();
 
 city.sortByDistance();
+
+
+
+
 
 
 
